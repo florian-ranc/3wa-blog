@@ -1,0 +1,10 @@
+<main>
+  <!-- Fonction php -->
+  <?php foreach($LastThreeArticles as $article) : ?>
+    <article class="article container textCenter">
+      <a href="single.php?id=<?= $article['id']?>"><h2><?= $article['articleTitle'] ?></h2></a>
+      <p>Rédigé par : <?= $article['pseudo'] ?>, le <?php $date = date_create($article['createDate']); echo date_format($date, 'd/m/Y');?></p>
+      <a href="single.php?id=<?= $article['id']?>"><img src="../img/recette/<?= $article['articleImage'] ?>" alt="<?= $article['articleTitle'] ?>"></a>
+    </article>
+  <?php endforeach ?>
+</main>
