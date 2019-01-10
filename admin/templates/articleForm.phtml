@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Interface Admin | Créer un Nouvel Article</title>
+  </head>
+  <body>
+    <form class="" action="<?= $action ?>" method="post" enctype="multipart/form-data">
+      <!--
+      Ce champ de type 'hidden' permettra au script 'update' de savoir quel est
+      l'enregistrement à modifier (d'après son identifiant unique 'productCode').
+      On aurait pu également mettre cette valeur dans un champ visible mais 'disabled'
+      -->
+      <input type="hidden" name="id" value="<?= $article['id'] ?>">
+      <table>
+        <tr>
+          <td><label for="articleTitle">Titre de l'article</label></td>
+          <td><input type="text"  name="articleTitle" size="75" value="<?= $article['articleTitle'] ?>" /></td>
+        </tr>
+        <tr>
+          <td><label for="category">Catégorie</label></td>
+          <td><select class="" name="category">
+            <option value=''>...</option>
+            <?php foreach($categories as $c) {
+              $selected = ($c['id'] == $article['category']) ? "selected" : "";
+              echo "<option value='" . $c['id'] . "' $selected >" . $c['categoryName'] . "</option>";
+            } ?>
+          </select></td>
+        </tr>
+
+        <tr>
+          <input type="hidden" name="MAX_FILE_SIZE" value="1048576" />
+          <td><label for="articleImage">Ajouter une image (JPG, PNG ou GIF | max. 1 Mo)</label></td>
+          <td><input type="file" name="articleImage" value="<?= $article['articleImage'] ?>" /></td>
+        </tr>
+        <tr>
+          <td><label for="author">Auteur</label></td>
+          <td><select class="" name="author">
+            <option value=''>...</option>
+            <?php foreach($authors as $a) {
+              $selected = ($a['pseudo'] == $a['pseudo']) ? "selected" : "";
+              echo "<option value='" . $a['id'] . "' $selected >" . $a['pseudo'] . "</option>";
+            } ?>
+          </select></td>
+        </tr>
+        <tr>
+          <td><label for="articleContent">Contenu de l'article :</label></td>
+          <td><textarea name="articleContent" rows="10" cols="100"><?= $article['articleContent'] ?></textarea></td>
+        </tr>
+        <tr>
+          <td><label for="favorite">Favori</label></td>
+          <td><input type="text"  name="favorite" value="<?= $article['favorite'] ?>" /></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><input type="submit" name="" value="<?= $submitValue ?>"></td>
+        </tr>
+      </table>
+    </form>
+  </body>
+</html>

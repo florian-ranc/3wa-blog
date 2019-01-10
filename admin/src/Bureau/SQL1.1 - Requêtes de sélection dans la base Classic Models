@@ -1,0 +1,140 @@
+//La liste des bureaux (adresse et ville) triés par pays décroissant puis par état
+SELECT `addressLine1`, `city`
+FROM `offices`
+ORDER BY `country` DESC, `state`
+
+//La liste des avions (code et nom) triés par vendeur et par quantité en stock décroissants
+SELECT `productCode`, `productName`
+FROM `products`
+WHERE `productLine` = 'Planes'
+ORDER BY `productVendor` DESC, `quantityInStock` DESC
+
+//La liste des produits (nom, vendeur et prix de vente) qui sont vendus au moins 132$
+//triés par nom du produit
+SELECT `productName`, `productVendor`, `buyPrice`
+FROM `products`
+WHERE 'buyPrice' >= 132
+ORDER BY `productName`
+
+//La liste des produits (code, nom, échelle et quantité) qui ont une échelle soit de 1:10,
+//soit de 1:18 triés par quantité en stock décroissante
+SELECT `productName`, `productCode`, `productScale`, `quantityInStock`
+FROM `products`
+WHERE `productScale` = 1:10 OROR `productScale` = 1:18
+-- Version alternative : `productScale` IN ('1:10', '1:18')
+ORDER BY `quantityInStock` DESC
+
+//La liste des produits (code, nom et prix d'achat) des produits achetés au moins 60$
+//au plus 90$ triés par prix d'achat
+SELECT `productCode`,`productName`,`buyPrice`
+FROM `products`
+WHERE `buyPrice` >= 60 AND `buyPrice` <= 90
+-- Version alternative : `buyPrice` BETWEEN 60 AND 90
+ORDER BY `buyPrice`
+//OU
+SELECT `productCode`, `productName`, 'buyPrice'
+FROM `products`
+WHERE `buyPrice` BETWEEN 60 AND 90
+ORDER BY `buyPrice`
+
+//La liste des motos (nom, vendeur, quantité et marge) triés par marge décroissante
+SELECT `productCode`, `productVendor`, `quantityInStock`, ROUND((`MSRP` - `buyPrice`), 2) AS `marge`
+--ROUND permet d'arrondir la marge à 2 décimales 
+FROM `products`
+WHERE `productLine` = 'Motorcycles'
+-- Version alternative : `productLine` LIKE 'motorcycles'
+ORDER BY `marge` DESC
+
+//La liste des commandes (numéro de commande, date de commande, date d'expédition,
+//écart en jours entre la date de commande et la date d'expédition, statut de la commande)
+//soit qui sont en cours de traitement, soit qui ont été expédiées plus de 10 jours après la date de commande triés par écart décroissant puis par date de commande
+SELECT `orderNumber`, `orderDate`, `shippedDate`, DATEDIFF(`shippedDate`, `orderDate`) AS `delai`, `status`
+FROM `orders` 
+WHERE `status` LIKE 'In Process' 
+OR  DATEDIFF(`shippedDate`, `orderDate`) > 10
+ORDER BY `orderDate` DESC, `delai` DESC
+
+//La liste des produits (nom et valeur du stock à la vente) des années 1960
+SELECT `productName` , `quantityInStock` , `MSRP` , ROUND(`quantityInStock` * `MSRP`,2) AS `ValStock`
+FROM `products`
+WHERE `productName`LIKE '%196%'
+
+//Le prix moyen d'un produit vendu par chaque vendeur triés par prix moyen décroissant
+SELECT `productVendor`, COUNT(`productName`) --COUNT renvoie le nombre de modèles liés à un fournisseur donné
+FROM `products` 
+WHERE 1 
+GROUP BY `productVendor`
+
+SELECT `productVendor`, `productName`, `MSRP`
+FROM `products`
+WHERE `productVendor` LIKE 'Auto%'
+
+SELECT `productVendor`, ROUND(AVG(`MSRP`), 2) AS `averagePrice`
+FROM `products`
+WHERE `productVendor` LIKE 'Auto%'
+GROUP BY `productVendor`  
+ORDER BY `averagePrice` DESC
+
+//Le nombre de produits pour chaque ligne de produit
+SELECT `productLine`, COUNT(`productCode`) AS `productLineCount`
+FROM `products`
+GROUP BY `productLine`
+
+//Le total du stock et le total de la valeur du stock à la vente de chaque ligne de produit
+//pour les produits vendus plus de 100$ trié par total de la valeur du stock à la vente
+SELECT `productLine`, SUM(`quantityInStock`) AS `totalStock`, ROUND(SUM(`quantityInStock`*`MSRP`), 2) AS `totalPrice`
+FROM `products`
+WHERE `MSRP` > 100
+GROUP BY `productLine`
+ORDER BY `totalStock` DESC, `totalPrice` DESC
+
+//La quantité du produit le plus en stock de chaque vendeur trié par vendeur
+SELECT `productVendor`, MAX(`quantityInStock`) 
+FROM `products`
+WHERE 1
+GROUP BY `productVendor`
+ORDER BY `productVendor`
+
+//Le prix de l'avion qui coûte le moins cher à l'achat
+SELECT `productLine`, MIN(`MSRP`) AS `moinsCher`
+FROM `products`
+WHERE `productLine` LIKE 'Planes'
+GROUP BY `productLine`
+
+//Le crédit des clients qui ont payé plus de 20000$ durant l'année 2004 trié par crédit décroissant
+SELECT `customerNumber`, ROUND(SUM(`amount`),2) AS `credit`
+FROM `payments`
+WHERE `paymentDate` LIKE '2004%'
+GROUP BY `customerNumber`
+HAVING `credit` > 20000
+ORDER BY `credit` DESC
+
+//La liste des employés (nom, prénom et fonction) et des bureaux (adresse et ville) dans lequel ils travaillent
+SELECT E.`lastName`,E.`firstName`,E.`jobTitle`,O.`addressLine1`,O.`city`
+FROM `employees` as E
+INNER JOIN `offices` as O ON E.`officeCode` = O.`officeCode`
+
+//La liste des clients français ou américains (nom du client, nom, prénom du contact et pays)
+//et de leur commercial dédié (nom et prénom) triés par nom et prénom du contact
+SELECT C.`customerName`, E.`firstName`, C.`country`
+FROM `customers` AS C
+INNER JOIN `employees` AS E ON E.`employeeNumber` = C.`salesRepEmployeeNumber`
+WHERE `country` IN ('France', 'USA')
+ORDER BY E.`lastName` ASC, E.`firstName`
+
+//La liste des lignes de commande (numéro de commande, code, nom et ligne de produit)
+//et la remise appliquée aux voitures ou motos commandées triées par numéro de commande puis par remise décroissante
+SELECT O.`orderNumber`, P.`productCode`, P.`productName`, P.`productLine`, 
+ROUND(((P.`MSRP` - OD.`priceEach`) * 100 / P.`MSRP`), 2) AS `remise`
+FROM `orders` AS O
+INNER JOIN `orderdetails` AS OD ON O.`orderNumber` = OD.`orderNumber`
+INNER JOIN `products` AS P ON OD.`productCode` = P.`productCode`
+-- WHERE P.`productLine` IN ('Motorcycles', 'Vintage Cars', 'Classic Cars')
+WHERE P.`productLine` LIKE 'Motorcycles' OR P.`productLine` LIKE '%Cars'
+ORDER BY `remise` DESC, O.`orderNumber`
+
+//Le total des paiements effectués de chaque client (numéro, nom et pays) américain,
+//allemand ou français de plus de 50000$ trié par pays puis par total des paiements décroissant
+
+//Le montant total de chaque commande (numéro et date) des clients New-Yorkais
+//(nom) trié par nom du client puis par date de commande

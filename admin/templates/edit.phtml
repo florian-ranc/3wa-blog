@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Interface Admin | Editer/Modifier des articles</title>
+  </head>
+  <body>
+    <section id="searchResults">
+      <?php if (isset($articles)) : ?>
+        <table>
+          <caption class=resultTableCaption align='top'>Liste des articles du blog</caption>
+            <thead>
+              <tr>
+                <th>Catégorie</th>
+                <th>id</th>
+                <th>Titre</th>
+                <th>Like</th>
+                <th>Favori</th>
+                <th>Auteur</th>
+                <th>Création</th>
+                <th>Publication</th>
+                <th>Action n°1</th>
+                <th>Action n°2</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach($articles as $a) : ?>
+                <tr>
+                  <td><?= $a['categoryName'] ?></td>
+                  <td><?= $a['id'] ?></td>
+                  <td><?= $a['articleTitle'] ?></td>
+                  <td><?= $a['articleLike'] ?></td>
+                  <td><?= $a['favorite'] ?></td>
+                  <td><?= $a['pseudo'] ?></td>
+                  <td><?= $a['createDate'] ?></td>
+                  <td><?= $a['publicationDate'] ?></td>
+                  <td>
+                    <a href="update.php?id=<?= $a['id'] ?>">Modifier</a>
+                  </td>
+                  <td>
+                    <a href="delete.php?id=<?= $a['id'] ?>">Effacer</a>
+                  </td>
+                </tr>
+              <?php endforeach ?>
+            </tbody>
+          </table>
+        <?php endif ?>
+        </section>
+  </body>
+</html>
